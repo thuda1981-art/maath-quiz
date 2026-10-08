@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: math-quiz
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22.13.0
+      - key: TRUST_PROXY
+        value: "1"
+      - key: MAX_PER_IP
+        value: "1"
+      - key: DATABASE_URL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
