@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تحدي الرياضيات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="logo">∑</span><span>تحدي الرياضيات <small class="beta">بيتا</small></span></div>
+  <nav>
+    <button class="tab active" data-view="home">الدروس</button>
+    <button class="tab" data-view="board">الصدارة</button>
+  </nav>
+</header>
+
+<main>
+  <section id="v-loading" class="view card center"><div class="spinner"></div></section>
+
+  <section id="v-register" class="view card" hidden>
+    <h1>سجّل لتبدأ</h1>
+    <form id="f-register">
+      <input name="name" required minlength="3" maxlength="50" autocomplete="name" placeholder="الاسم">
+      <select name="grade" required><option value="">الصف</option></select>
+      <p class="err" id="reg-err"></p>
+      <button class="btn primary" type="submit">ابدأ</button>
+    </form>
+  </section>
+
+  <section id="v-blocked" class="view card" hidden>
+    <h1>هذا الجهاز مسجّل مسبقاً</h1>
+    <form id="f-restore">
+      <input name="name" required minlength="3" maxlength="50" placeholder="اسمك المسجّل">
+      <p class="err" id="restore-err"></p>
+      <button class="btn primary" type="submit">دخول</button>
+    </form>
+  </section>
+
+  <!-- الفصول -->
+  <section id="v-home" class="view" hidden>
+    <div class="hello"><b id="h-name"></b><span class="chip">★ <b id="h-points">0</b></span><span class="chip">🏆 <b id="h-rank">–</b></span></div>
+    <div class="bubbles" id="chapters"></div>
+  </section>
+
+  <!-- دروس الفصل -->
+  <section id="v-chapter" class="view" hidden>
+    <div class="bar-head"><button class="back" data-back="home">→</button><h1 id="c-title"></h1></div>
+    <div class="path" id="lessons"></div>
+  </section>
+
+  <!-- الشرح -->
+  <section id="v-learn" class="view" hidden>
+    <div class="bar-head"><button class="back" id="learn-back">→</button><h1 id="l-title"></h1></div>
+    <div class="card review-note" id="l-review" hidden>٣ أخطاء — راجع الشرح ثم أكمل</div>
+    <div class="card learn">
+      <p class="idea" id="l-idea"></p>
+      <ul class="rules" id="l-rules"></ul>
+    </div>
+    <div id="l-examples"></div>
+    <button class="btn primary wide" id="l-start">ابدأ الحل</button>
+  </section>
+
+  <!-- الأسئلة -->
+  <section id="v-quiz" class="view" hidden>
+    <div class="bar-head">
+      <button class="back" id="quiz-back">→</button>
+      <div class="qprog"><i id="q-bar"></i></div>
+      <span class="hearts" id="q-hearts"></span>
+    </div>
+    <div class="card qcard">
+      <div class="qhead">
+        <span class="level" id="q-level"></span>
+        <button class="link" id="q-explain">📖 الشرح</button>
+      </div>
+      <h2 class="qtext" id="q-text"></h2>
+      <div class="choices" id="q-choices"></div>
+      <div class="feedback" id="q-feedback" hidden></div>
+      <button class="btn primary wide" id="q-next" hidden>التالي ←</button>
+    </div>
+  </section>
+
+  <!-- انتهاء الدرس -->
+  <section id="v-done" class="view card center" hidden>
+    <div class="trophy">🎉</div>
+    <h1>أحسنت! أنهيت الدرس</h1>
+    <div class="done-btns">
+      <button class="btn primary" id="d-next">الدرس التالي ←</button>
+      <button class="btn ghost" data-back="home">الدروس</button>
+    </div>
+  </section>
+
+  <!-- الصدارة -->
+  <section id="v-board" class="view card" hidden>
+    <div class="board-head">
+      <h1>الصدارة</h1>
+      <select id="b-grade"><option value="">كل الصفوف</option></select>
+    </div>
+    <ol class="board" id="b-list"></ol>
+    <p class="muted center" id="b-empty" hidden>لا يوجد أحد بعد</p>
+  </section>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>

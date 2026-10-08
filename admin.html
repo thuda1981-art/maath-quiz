@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة المعلم</title>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/style.css">
+<style>
+  main { max-width: 1000px; }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  th, td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: start; }
+  th { color: var(--muted); font-weight: 600; }
+  .tbl { overflow-x: auto; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 14px 0; }
+  .sm { padding: 6px 10px; font-size: .85rem; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); cursor: pointer; font: inherit; }
+  .sm.del { color: var(--bad); }
+</style>
+</head>
+<body>
+<header class="top"><div class="brand"><span class="logo">∑</span><span>لوحة المعلم</span></div><a href="/" class="muted">← الموقع</a></header>
+<main>
+  <section class="card" id="login">
+    <h1>تسجيل دخول المعلم</h1>
+    <form id="f-login"><label>كلمة المرور<input type="password" name="pw" required></label><p class="err" id="l-err"></p><button class="btn primary">دخول</button></form>
+  </section>
+  <section class="card" id="panel" hidden>
+    <h1>الطلاب المسجلون (<span id="count">0</span>)</h1>
+    <p class="muted small" id="info"></p>
+    <div class="row">
+      <button class="btn primary" id="refresh">تحديث</button>
+      <button class="btn primary" id="export">تصدير Excel (CSV)</button>
+      <button class="btn primary" id="reload">إعادة تحميل المنهج</button>
+    </div>
+    <div class="tbl"><table>
+      <thead><tr><th>#</th><th>الاسم</th><th>الصف</th><th>محلولة</th><th>صحيحة من أول مرة</th><th>محاولات</th><th>نقاط</th><th>IP</th><th>التسجيل</th><th></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+  </section>
+</main>
+<script>
+let PW = sessionStorage.getItem('mq_admin') || '';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function api(path, method = 'GET') {
+  const r = await fetch(path, { method, headers: { 'x-admin-password': PW } });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || 'خطأ');
+  return d;
+}
+async function load() {
+  const d = await api('/api/admin/students');
+  $('#login').hidden = true; $('#panel').hidden = false;
+  $('#count').textContent = d.rows.length;
+  $('#info').textContent = `الدروس: ${d.lessons} · الأسئلة: ${d.total} · قاعدة البيانات: ${d.db === 'pg' ? 'PostgreSQL' : 'SQLite'}`;
+  $('#rows').innerHTML = d.rows.map((s, i) => `<tr>
+    <td>${i + 1}</td><td>${esc(s.name)}</td><td>${esc(s.grade)}</td><td>${s.solved} / ${d.total}</td><td>${s.correct}</td><td>${s.answered}</td><td>${s.points}</td>
+    <td dir="ltr">${esc(s.ip)}</td><td>${new Date(s.created_at).toLocaleDateString('ar-SA')}</td>
+    <td><button class="sm" data-reset="${s.id}">تصفير</button> <button class="sm del" data-del="${s.id}">حذف</button></td></tr>`).join('');
+}
+$('#f-login').onsubmit = async e => {
+  e.preventDefault(); PW = new FormData(e.target).get('pw');
+  try { await load(); sessionStorage.setItem('mq_admin', PW); } catch (err) { $('#l-err').textContent = err.message; }
+};
+$('#refresh').onclick = load;
+$('#export').onclick = () => location.href = '/api/admin/export.csv?pw=' + encodeURIComponent(PW);
+$('#reload').onclick = async () => { try { const r = await api('/api/admin/reload-questions', 'POST'); alert('تم تحميل ' + r.total + ' سؤال'); load(); } catch (e) { alert(e.message); } };
+$('#rows').onclick = async e => {
+  const del = e.target.dataset.del, reset = e.target.dataset.reset;
+  if (del && confirm('حذف الطالب نهائياً؟ (سيتمكن من التسجيل من جديد)')) { await api('/api/admin/students/' + del, 'DELETE'); load(); }
+  if (reset && confirm('تصفير نتائج هذا الطالب؟')) { await api('/api/admin/students/' + reset + '/reset', 'POST'); load(); }
+};
+if (PW) load().catch(() => {});
+</script>
+</body>
+</html>

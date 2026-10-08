@@ -1,0 +1,15 @@
+{
+  "name": "math-quiz",
+  "version": "0.1.0-beta",
+  "description": "منصة تحدي الرياضيات للطلاب مع لوحة صدارة",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "optionalDependencies": {
+    "pg": "^8.13.0"
+  }
+}
